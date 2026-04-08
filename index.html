@@ -94,7 +94,8 @@ function atualizarLista() {
 }
 
 function escrever() {
-  let nome = document.getElementById("nome").value;
+  document.getElementById("resultado").innerHTML =
+  "☠️ " + nome + " teve seu destino selado...";
 
   if (!nome) {
     alert("Digite um nome...");
