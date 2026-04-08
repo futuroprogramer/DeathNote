@@ -4,71 +4,22 @@
 <meta charset="UTF-8">
 <title>Death Note</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-
 <style>
 body {
-  margin: 0;
-  padding: 0;
-  background: #111;
-  color: #fff;
-  font-family: 'Courier New', monospace;
-  text-align: center;
-}
-
-/* capa */
-h1 {
-  font-family: 'Creepster', cursive;
-  font-size: 70px;
-  letter-spacing: 5px;
-  margin-top: 50px;
-}
-
-/* folha estilo caderno */
-.caderno {
-  background: #f5f5dc;
-  color: black;
-  width: 400px;
-  margin: 50px auto;
-  padding: 30px;
-  box-shadow: 0 0 20px black;
-  border-radius: 5px;
-  position: relative;
-}
-
-/* linhas tipo caderno */
-.caderno::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 40px;
-  width: 2px;
-  height: 100%;
-  background: red;
-}
-
-input {
-  width: 80%;
-  padding: 10px;
-  font-size: 18px;
-  border: none;
-  border-bottom: 2px solid black;
-  background: transparent;
-}
-
-button {
-  margin-top: 20px;
-  padding: 10px 20px;
   background: black;
   color: white;
-  border: none;
-  cursor: pointer;
+  text-align: center;
+  font-family: Arial;
 }
 
-.result {
+input, button {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.lista {
   margin-top: 20px;
-  color: darkred;
-  font-weight: bold;
+  color: red;
 }
 </style>
 </head>
@@ -77,35 +28,36 @@ button {
 
 <h1>DEATH NOTE</h1>
 
-<div class="caderno">
-  <p>O humano cujo nome for escrito aqui morrerá...</p>
+<input type="text" id="nome" placeholder="Digite um nome">
+<button onclick="escrever()">Escrever</button>
 
-  <input type="text" id="nome" placeholder="Digite o nome...">
-  <br>
-  <button onclick="escrever()">Escrever</button>
-
-  <div class="result" id="resultado"></div>
-</div>
+<div class="lista" id="lista"></div>
 
 <script>
+// carregar nomes salvos
+let nomes = JSON.parse(localStorage.getItem("nomes")) || [];
+
+// mostrar na tela
+function mostrarLista() {
+  document.getElementById("lista").innerHTML = nomes.join("<br>");
+}
+
+// adicionar nome
 function escrever() {
   let nome = document.getElementById("nome").value;
 
-  if(nome === "") {
-    alert("Digite um nome...");
-    return;
-  }
+  if (nome === "") return;
 
-  document.getElementById("resultado").innerHTML =
-    "✒️ " + nome + " teve seu destino selado... ☠️";
+  nomes.push(nome);
 
-  // efeito dramático
-  document.body.style.background = "#000";
+  // salvar no navegador
+  localStorage.setItem("nomes", JSON.stringify(nomes));
 
-  // som (opcional, pode bloquear no celular)
-  let audio = new Audio("https://www.soundjay.com/button/beep-07.wav");
-  audio.play();
+  mostrarLista();
 }
+
+// carregar quando abrir o site
+mostrarLista();
 </script>
 
 </body>
