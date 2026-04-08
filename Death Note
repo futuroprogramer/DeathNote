@@ -4,22 +4,81 @@
 <meta charset="UTF-8">
 <title>Death Note</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+
 <style>
 body {
-  background: black;
+  margin: 0;
+  background: #111;
+  font-family: 'Courier New', monospace;
   color: white;
   text-align: center;
-  font-family: Arial;
 }
 
-input, button {
+/* título */
+h1 {
+  font-family: 'Creepster', cursive;
+  font-size: 60px;
+  margin-top: 40px;
+}
+
+/* caderno */
+.caderno {
+  background: #f5f5dc;
+  color: black;
+  width: 400px;
+  margin: 30px auto;
+  padding: 30px;
+  box-shadow: 0 0 30px black;
+  border-radius: 5px;
+  position: relative;
+}
+
+/* linha vermelha */
+.caderno::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 40px;
+  width: 2px;
+  height: 100%;
+  background: red;
+}
+
+/* input */
+input {
+  width: 80%;
   padding: 10px;
-  font-size: 16px;
+  font-size: 18px;
+  border: none;
+  border-bottom: 2px solid black;
+  background: transparent;
 }
 
+/* botão */
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* resultado */
+.result {
+  margin-top: 20px;
+  color: darkred;
+  font-weight: bold;
+}
+
+/* lista */
 .lista {
   margin-top: 20px;
-  color: red;
+  text-align: left;
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 14px;
 }
 </style>
 </head>
@@ -28,36 +87,65 @@ input, button {
 
 <h1>DEATH NOTE</h1>
 
-<input type="text" id="nome" placeholder="Digite um nome">
-<button onclick="escrever()">Escrever</button>
+<div class="caderno">
+  <p>O humano cujo nome for escrito aqui morrerá...</p>
 
-<div class="lista" id="lista"></div>
+  <input type="text" id="nome" placeholder="Digite o nome...">
+  <br>
+  <button onclick="escrever()">Escrever</button>
+
+  <div class="result" id="resultado"></div>
+
+  <div class="lista" id="lista"></div>
+</div>
 
 <script>
 // carregar nomes salvos
 let nomes = JSON.parse(localStorage.getItem("nomes")) || [];
 
-// mostrar na tela
-function mostrarLista() {
-  document.getElementById("lista").innerHTML = nomes.join("<br>");
+// mostrar lista
+function atualizarLista() {
+  document.getElementById("lista").innerHTML =
+    nomes.map(n => "✒️ " + n).join("<br>");
 }
 
-// adicionar nome
+// efeito de escrita
+function efeitoTexto(texto) {
+  let i = 0;
+  let el = document.getElementById("resultado");
+  el.innerHTML = "";
+
+  let intervalo = setInterval(() => {
+    el.innerHTML += texto[i];
+    i++;
+    if (i >= texto.length) clearInterval(intervalo);
+  }, 40);
+}
+
+// escrever nome
 function escrever() {
   let nome = document.getElementById("nome").value;
 
-  if (nome === "") return;
+  if (!nome) {
+    alert("Digite um nome...");
+    return;
+  }
 
   nomes.push(nome);
 
-  // salvar no navegador
+  // salvar
   localStorage.setItem("nomes", JSON.stringify(nomes));
 
-  mostrarLista();
+  // efeito dramático
+  setTimeout(() => {
+    efeitoTexto("☠️ " + nome + " teve seu destino selado...");
+  }, 500);
+
+  atualizarLista();
 }
 
-// carregar quando abrir o site
-mostrarLista();
+// carregar ao abrir
+atualizarLista();
 </script>
 
 </body>
