@@ -22,13 +22,19 @@ h1 {
 }
 
 .caderno {
-  background: #f5f5dc;
-  color: black;
-  width: 400px;
+  width: 500px;
   margin: 30px auto;
-  padding: 30px;
+  padding: 40px 30px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #f5f5dc,
+    #f5f5dc 28px,
+    #ccc 29px
+  );
+  color: black;
   box-shadow: 0 0 30px black;
   position: relative;
+}
 }
 
 .caderno::before {
