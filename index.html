@@ -105,7 +105,7 @@ function atualizarLista() {
     nomes.join("<br>");
 }
 
-// efeito de escrita ✍️
+// efeito de escrita
 function escreverTexto(texto) {
   let i = 0;
   let el = document.getElementById("resultado");
@@ -119,26 +119,29 @@ function escreverTexto(texto) {
 }
 
 function escrever() {
-  let nome = document.getElementById("nome").value;
+  let input = document.getElementById("nome");
+  let nome = input.value;
 
   if (!nome) {
     alert("Digite um nome...");
     return;
   }
 
+  // salva nome
   nomes.push(nome);
   localStorage.setItem("nomes", JSON.stringify(nomes));
 
-  // efeito com delay 😈
-  setTimeout(() => {
-    escreverTexto("☠️ " + nome + " teve seu destino selado...");
-  }, 500);
+  // mostra mensagem
+  escreverTexto("☠️ " + nome + " teve seu destino selado...");
 
+  // atualiza lista
   atualizarLista();
+
+  // limpa o input
+  input.value = "";
 }
 
+// carrega ao abrir
 atualizarLista();
 </script>
-
-</body>
-</html>
+  
