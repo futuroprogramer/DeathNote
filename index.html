@@ -95,15 +95,37 @@ button {
   <div class="lista" id="lista"></div>
 </div>
 
-<script>
-let nomes = JSON.parse(localStorage.getItem("nomes")) || [];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-function atualizarLista() {
-  document.getElementById("lista").innerHTML =
-    nomes.join("<br>");
-}
+// SUA CONFIG 🔥
+const firebaseConfig = {
+  apiKey: "AIzaSyAqaceT9RVD-ZkbF3P_wv7VfTS0VViKtJY",
+  authDomain: "death-note-8aaae.firebaseapp.com",
+  databaseURL: "https://death-note-8aaae-default-rtdb.firebaseio.com",
+  projectId: "death-note-8aaae",
+  storageBucket: "death-note-8aaae.firebasestorage.app",
+  messagingSenderId: "371205022088",
+  appId: "1:371205022088:web:19ce0df7e05ddb518f9a3d"
+};
 
-// efeito de escrita
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// lista GLOBAL em tempo real 😈
+onValue(ref(db, "nomes"), (snapshot) => {
+  let data = snapshot.val();
+  let lista = [];
+
+  if (data) {
+    lista = Object.values(data);
+  }
+
+  document.getElementById("lista").innerHTML = lista.join("<br>");
+});
+
+// efeito escrita
 function escreverTexto(texto) {
   let i = 0;
   let el = document.getElementById("resultado");
@@ -116,11 +138,10 @@ function escreverTexto(texto) {
   }, 40);
 }
 
+// contador 40s 💀
 function contadorMorte(nome) {
   let tempo = 40;
   let el = document.getElementById("resultado");
-
-  el.innerHTML = ""; // limpa antes de começar
 
   let intervalo = setInterval(() => {
     if (tempo > 0) {
@@ -128,14 +149,13 @@ function contadorMorte(nome) {
       tempo--;
     } else {
       clearInterval(intervalo);
-
-      // só executa depois que termina
       escreverTexto("☠️ " + nome + " teve seu destino selado...");
     }
   }, 1000);
 }
 
-function escrever() {
+// função global (botão)
+window.escrever = function () {
   let input = document.getElementById("nome");
   let nome = input.value;
 
@@ -144,18 +164,13 @@ function escrever() {
     return;
   }
 
-  nomes.push(nome);
-  localStorage.setItem("nomes", JSON.stringify(nomes));
+  // salva no banco 🌐
+  push(ref(db, "nomes"), nome);
 
-  atualizarLista();
-
-  // inicia contador 😈
   contadorMorte(nome);
 
   input.value = "";
-}
-
-atualizarLista();
+};
 </script>
 
 </body>
