@@ -50,32 +50,18 @@ h1 {
 input {
   width: 80%;
   padding: 10px;
-  font-size: 18px;
-  border: none;
-  border-bottom: 2px solid black;
-  background: transparent;
 }
 
 button {
   margin-top: 10px;
   padding: 10px 20px;
-  background: black;
-  color: white;
-  border: none;
-  cursor: pointer;
 }
 
-.result {
-  margin-top: 20px;
-  color: darkred;
-}
-
-.lista {
+.lista, #ranking {
   margin-top: 20px;
   text-align: left;
   padding-left: 50px;
   line-height: 30px;
-  font-size: 18px;
 }
 </style>
 </head>
@@ -94,24 +80,23 @@ button {
   <br>
   <button onclick="escrever()">Escrever</button>
 
-  <div class="result" id="resultado"></div>
-  <div class="lista" id="lista"></div>
+  <div id="resultado"></div>
+  <div id="lista"></div>
 </div>
+
+<h2>🏆 Ranking dos Kiras</h2>
+<div id="ranking"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// CONFIG 🔥
 const firebaseConfig = {
   apiKey: "AIzaSyAqaceT9RVD-ZkbF3P_wv7VfTS0VViKtJY",
   authDomain: "death-note-8aaae.firebaseapp.com",
   databaseURL: "https://death-note-8aaae-default-rtdb.firebaseio.com",
-  projectId: "death-note-8aaae",
-  storageBucket: "death-note-8aaae.firebasestorage.app",
-  messagingSenderId: "371205022088",
-  appId: "1:371205022088:web:19ce0df7e05ddb518f9a3d"
+  projectId: "death-note-8aaae"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -119,13 +104,11 @@ const db = getDatabase(app);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 
-// LOGIN 🔐
+// LOGIN
 window.login = async function () {
   const result = await signInWithPopup(auth, provider);
-  const user = result.user;
-
-  document.getElementById("user").innerHTML =
-    "Logado como: " + user.displayName;
+  document.getElementById("user").innerText =
+    "Logado como: " + result.user.displayName;
 };
 
 // LISTA GLOBAL
@@ -140,18 +123,27 @@ onValue(ref(db, "nomes"), (snapshot) => {
   document.getElementById("lista").innerHTML = lista.join("<br>");
 });
 
-// EFEITO
-function escreverTexto(texto) {
-  let i = 0;
-  let el = document.getElementById("resultado");
-  el.innerHTML = "";
+// RANKING VISÍVEL
+onValue(ref(db, "ranking"), (snapshot) => {
+  let data = snapshot.val();
+  if (!data) return;
 
-  let intervalo = setInterval(() => {
-    el.innerHTML += texto[i];
-    i++;
-    if (i >= texto.length) clearInterval(intervalo);
-  }, 40);
-}
+  let lista = [];
+
+  for (let id in data) {
+    lista.push({
+      nome: data[id].nome,
+      pontos: data[id].pontos
+    });
+  }
+
+  lista.sort((a, b) => b.pontos - a.pontos);
+
+  document.getElementById("ranking").innerHTML =
+    lista.map((u, i) =>
+      `#${i+1} 👑 ${u.nome} - ${u.pontos} nomes`
+    ).join("<br>");
+});
 
 // CONTADOR
 function contadorMorte(nome) {
@@ -160,42 +152,42 @@ function contadorMorte(nome) {
 
   let intervalo = setInterval(() => {
     if (tempo > 0) {
-      el.innerHTML = "☠️ " + nome + " morrerá em " + tempo + "s...";
+      el.innerHTML = nome + " morrerá em " + tempo + "s...";
       tempo--;
     } else {
       clearInterval(intervalo);
-      escreverTexto("☠️ " + nome + " teve seu destino selado...");
+      el.innerHTML = nome + " teve seu destino selado ☠️";
     }
   }, 1000);
 }
 
-// ESCREVER GLOBAL + RANKING
+// ESCREVER + RANKING
 window.escrever = async function () {
   let input = document.getElementById("nome");
   let nome = input.value;
-
-  const user = auth.currentUser;
+  let user = auth.currentUser;
 
   if (!user) {
-    alert("Faça login primeiro!");
+    alert("Faça login!");
     return;
   }
 
   if (!nome) return;
 
-  // salva nome
   push(ref(db, "nomes"), {
     nome: nome,
     user: user.displayName
   });
 
-  // ranking
-  let userRef = ref(db, "ranking/" + user.uid);
+  let refUser = ref(db, "ranking/" + user.uid);
+  let snap = await get(refUser);
 
-  let snap = await get(userRef);
-  let atual = snap.val() || 0;
+  let atual = snap.val() || { nome: user.displayName, pontos: 0 };
 
-  set(userRef, atual + 1);
+  set(refUser, {
+    nome: user.displayName,
+    pontos: atual.pontos + 1
+  });
 
   contadorMorte(nome);
   input.value = "";
