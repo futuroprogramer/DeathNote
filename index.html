@@ -116,17 +116,20 @@ function escreverTexto(texto) {
   }, 40);
 }
 
-// contador 40 segundos 💀
 function contadorMorte(nome) {
   let tempo = 40;
   let el = document.getElementById("resultado");
 
-  let intervalo = setInterval(() => {
-    el.innerHTML = "☠️ " + nome + " morrerá em " + tempo + "s...";
-    tempo--;
+  el.innerHTML = ""; // limpa antes de começar
 
-    if (tempo < 0) {
+  let intervalo = setInterval(() => {
+    if (tempo > 0) {
+      el.innerHTML = "☠️ " + nome + " morrerá em " + tempo + "s...";
+      tempo--;
+    } else {
       clearInterval(intervalo);
+
+      // só executa depois que termina
       escreverTexto("☠️ " + nome + " teve seu destino selado...");
     }
   }, 1000);
