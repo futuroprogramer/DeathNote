@@ -110,8 +110,13 @@ function atualizarLista() {
 }
 
 function escrever() {
+  let nome = document.getElementById("nome").value;
+
+  if (!nome) return;
+
   document.getElementById("resultado").innerHTML =
-  "☠️ " + nome + " teve seu destino selado...";
+    nome + " teve seu destino selado... ☠️";
+}
 
   if (!nome) {
     alert("Digite um nome...");
