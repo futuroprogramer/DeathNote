@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <html>
-  <button onclick="login()">Login com Google</button>
-<div id="user"></div>
-  }
-  
 <head>
 <meta charset="UTF-8">
 <title>Death Note</title>
@@ -61,7 +57,7 @@ input {
 }
 
 button {
-  margin-top: 15px;
+  margin-top: 10px;
   padding: 10px 20px;
   background: black;
   color: white;
@@ -88,6 +84,9 @@ button {
 
 <h1>DEATH NOTE</h1>
 
+<button onclick="login()">Login com Google</button>
+<div id="user"></div>
+
 <div class="caderno">
   <p>O humano cujo nome for escrito aqui morrerá...</p>
 
@@ -101,9 +100,10 @@ button {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// SUA CONFIG 🔥
+// CONFIG 🔥
 const firebaseConfig = {
   apiKey: "AIzaSyAqaceT9RVD-ZkbF3P_wv7VfTS0VViKtJY",
   authDomain: "death-note-8aaae.firebaseapp.com",
@@ -116,20 +116,31 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
 
-// lista GLOBAL em tempo real 😈
+// LOGIN 🔐
+window.login = async function () {
+  const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+
+  document.getElementById("user").innerHTML =
+    "Logado como: " + user.displayName;
+};
+
+// LISTA GLOBAL
 onValue(ref(db, "nomes"), (snapshot) => {
   let data = snapshot.val();
   let lista = [];
 
   if (data) {
-    lista = Object.values(data);
+    lista = Object.values(data).map(n => n.nome);
   }
 
   document.getElementById("lista").innerHTML = lista.join("<br>");
 });
 
-// efeito escrita
+// EFEITO
 function escreverTexto(texto) {
   let i = 0;
   let el = document.getElementById("resultado");
@@ -142,7 +153,7 @@ function escreverTexto(texto) {
   }, 40);
 }
 
-// contador 40s 💀
+// CONTADOR
 function contadorMorte(nome) {
   let tempo = 40;
   let el = document.getElementById("resultado");
@@ -158,35 +169,36 @@ function contadorMorte(nome) {
   }, 1000);
 }
 
-// função global (botão)
-window.escrever = function () {
+// ESCREVER GLOBAL + RANKING
+window.escrever = async function () {
   let input = document.getElementById("nome");
   let nome = input.value;
 
-  if (!nome) {
-    alert("Digite um nome...");
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Faça login primeiro!");
     return;
   }
 
-  // salva no banco 🌐
-  push(ref(db, "nomes"), nome);
+  if (!nome) return;
+
+  // salva nome
+  push(ref(db, "nomes"), {
+    nome: nome,
+    user: user.displayName
+  });
+
+  // ranking
+  let userRef = ref(db, "ranking/" + user.uid);
+
+  let snap = await get(userRef);
+  let atual = snap.val() || 0;
+
+  set(userRef, atual + 1);
 
   contadorMorte(nome);
-
   input.value = "";
-
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const auth = getAuth();
-const provider = new GoogleAuthProvider();
-
-window.login = async function () {
-  const result = await signInWithPopup(auth, provider);
-  const user = result.user;
-
-  document.getElementById("user").innerHTML =
-    "Logado como: " + user.displayName;
-};
 };
 </script>
 
