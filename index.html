@@ -15,10 +15,14 @@ body {
   text-align: center;
 }
 
+@font-face {
+  font-family: 'DeathNote';
+  src: url('DEATHNOTEFont.ttf');
+}
+
 h1 {
   font-family: 'DeathNote';
   font-size: 70px;
-}
 }
 
 .caderno {
@@ -34,7 +38,6 @@ h1 {
   color: black;
   box-shadow: 0 0 30px black;
   position: relative;
-}
 }
 
 .caderno::before {
@@ -69,19 +72,12 @@ button {
   color: darkred;
 }
 
-  .lista {
+.lista {
   margin-top: 20px;
   text-align: left;
   padding-left: 50px;
   line-height: 30px;
   font-size: 18px;
-}
-}
-
-  @font-face {
-  font-family: 'DeathNote';
-  src: url('DEATHNOTEFont.ttf');
-}
 }
 </style>
 </head>
@@ -106,17 +102,24 @@ let nomes = JSON.parse(localStorage.getItem("nomes")) || [];
 
 function atualizarLista() {
   document.getElementById("lista").innerHTML =
-    nomes.map(n => "✒️ " + n).join("<br>");
+    nomes.join("<br>");
+}
+
+// efeito de escrita ✍️
+function escreverTexto(texto) {
+  let i = 0;
+  let el = document.getElementById("resultado");
+  el.innerHTML = "";
+
+  let intervalo = setInterval(() => {
+    el.innerHTML += texto[i];
+    i++;
+    if (i >= texto.length) clearInterval(intervalo);
+  }, 40);
 }
 
 function escrever() {
   let nome = document.getElementById("nome").value;
-
-  if (!nome) return;
-
-  document.getElementById("resultado").innerHTML =
-    nome + " teve seu destino selado... ☠️";
-}
 
   if (!nome) {
     alert("Digite um nome...");
@@ -126,8 +129,10 @@ function escrever() {
   nomes.push(nome);
   localStorage.setItem("nomes", JSON.stringify(nomes));
 
-  document.getElementById("resultado").innerHTML =
-    "☠️ " + nome + " teve seu destino selado...";
+  // efeito com delay 😈
+  setTimeout(() => {
+    escreverTexto("☠️ " + nome + " teve seu destino selado...");
+  }, 500);
 
   atualizarLista();
 }
