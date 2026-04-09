@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <title>Death Note</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-
 <style>
 body {
   margin: 0;
@@ -118,6 +116,22 @@ function escreverTexto(texto) {
   }, 40);
 }
 
+// contador 40 segundos 💀
+function contadorMorte(nome) {
+  let tempo = 40;
+  let el = document.getElementById("resultado");
+
+  let intervalo = setInterval(() => {
+    el.innerHTML = "☠️ " + nome + " morrerá em " + tempo + "s...";
+    tempo--;
+
+    if (tempo < 0) {
+      clearInterval(intervalo);
+      escreverTexto("☠️ " + nome + " teve seu destino selado...");
+    }
+  }, 1000);
+}
+
 function escrever() {
   let input = document.getElementById("nome");
   let nome = input.value;
@@ -127,21 +141,19 @@ function escrever() {
     return;
   }
 
-  // salva nome
   nomes.push(nome);
   localStorage.setItem("nomes", JSON.stringify(nomes));
 
-  // mostra mensagem
-  escreverTexto("☠️ " + nome + " teve seu destino selado...");
-
-  // atualiza lista
   atualizarLista();
 
-  // limpa o input
+  // inicia contador 😈
+  contadorMorte(nome);
+
   input.value = "";
 }
 
-// carrega ao abrir
 atualizarLista();
 </script>
-  
+
+</body>
+</html>
